@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Mi Muro Azul - Gestor de Posts</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- CSS propio -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="container">
+    <h1><i class="fas fa-feather-alt"></i> Muro Azul · Publicaciones</h1>
+
+    <!-- formulario para nuevo post -->
+    <div class="post-form">
+        <h3 style="margin-bottom: 12px; color:#1e6f9f;"><i class="fas fa-plus-circle"></i> Crear nuevo post</h3>
+        <div class="form-group">
+            <input type="text" id="postTitulo" placeholder="Título del post *" maxlength="100">
+        </div>
+        <div class="form-group">
+            <textarea id="postTexto" placeholder="Escribe tu contenido aquí..."></textarea>
+        </div>
+        <div class="form-group">
+            <input type="text" id="postImagen" placeholder="URL de imagen (opcional)">
+        </div>
+        <div class="form-group">
+            <input type="text" id="postVideo" placeholder="URL de video (YouTube, mp4 directo, etc.)">
+            <small style="color:#2c7ab1;">Pega enlace de YouTube (se incrustará) o video .mp4</small>
+        </div>
+        <div class="form-group">
+            <input type="text" id="postLink" placeholder="URL de enlace externo (opcional)">
+        </div>
+        <div class="form-group">
+            <label style="margin-right: 12px;"><i class="fas fa-lock"></i> Visibilidad:</label>
+            <select id="postPrivado">
+                <option value="publico">Público (visible para todos)</option>
+                <option value="privado">Privado (solo para mí)</option>
+            </select>
+        </div>
+        <button class="btn" id="btnPublicar"><i class="fas fa-paper-plane"></i> Publicar Post</button>
+    </div>
+
+    <!-- barra de filtros y busqueda -->
+    <div class="barra-filtros">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="🔍 Buscar por título o texto...">
+            <button id="clearSearch" class="btn-sm btn-outline"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="priv-filter">
+            <span><i class="fas fa-eye"></i> Mostrar:</span>
+            <select id="filterPrivado">
+                <option value="todos">Todos (públicos + privados)</option>
+                <option value="publico">Solo públicos</option>
+                <option value="privado">Solo privados</option>
+            </select>
+        </div>
+        <span id="postCount" class="badge">0 posts</span>
+    </div>
+
+    <!-- contenedor de posts -->
+    <div id="postsContainer" class="posts-grid"></div>
+
+    <!-- CAJA DE COMENTARIOS AL FINAL DE LA WEB (global) -->
+    <div class="comentarios-final">
+        <h3><i class="fas fa-comments"></i> Comentarios de la comunidad</h3>
+        <div id="comentariosLista" class="comentarios-list"></div>
+        <div class="form-group" style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <input type="text" id="comentNombre" placeholder="Tu nombre" style="flex:1;">
+            <textarea id="comentTexto" placeholder="Escribe un comentario..." rows="2" style="flex:2;"></textarea>
+            <button id="btnComentar" class="btn"><i class="fas fa-paper-plane"></i> Comentar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL PARA EDITAR POST -->
+<div id="editModal" class="modal-edit">
+    <div class="modal-card">
+        <h3 style="color: #1e6f9f;"><i class="fas fa-edit"></i> Editar Post</h3>
+        <input type="hidden" id="editPostId">
+        <div class="form-group"><input type="text" id="editTitulo" placeholder="Título"></div>
+        <div class="form-group"><textarea id="editTexto" rows="3" placeholder="Contenido"></textarea></div>
+        <div class="form-group"><input type="text" id="editImagen" placeholder="URL imagen"></div>
+        <div class="form-group"><input type="text" id="editVideo" placeholder="URL video"></div>
+        <div class="form-group"><input type="text" id="editLink" placeholder="URL enlace"></div>
+        <div class="form-group">
+            <select id="editPrivado">
+                <option value="publico">Público</option>
+                <option value="privado">Privado</option>
+            </select>
+        </div>
+        <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 15px;">
+            <button class="btn-outline btn" id="closeModalBtn">Cancelar</button>
+            <button class="btn" id="saveEditBtn">Guardar cambios</button>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
