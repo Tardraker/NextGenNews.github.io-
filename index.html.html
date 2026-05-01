@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Mi Muro Azul - Gestor de Posts</title>
+    <!-- Font Awesome 6 (gratuito para iconos) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f0f8ff; /* azul muy clarito */
+            color: #0a2b3e;
+            padding: 20px;
+        }
+
+        /* contenedor principal */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+            overflow: hidden;
+            padding: 20px 30px 40px;
+        }
+
+        /* encabezado */
+        h1 {
+            color: #1e6f9f;
+            font-weight: 700;
+            border-left: 6px solid #1e88e5;
+            padding-left: 20px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        h1 i {
+            background: #1e88e5;
+            color: white;
+            padding: 10px;
+            border-radius: 40px;
+        }
+
+        /* formulario nuevo post */
+        .post-form {
+            background: #eef5fc;
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 35px;
+            border: 1px solid #cde3f5;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 40px;
+            border: 1px solid #bbdef5;
+            background: white;
+            font-size: 15px;
+            transition: 0.2s;
+        }
+        textarea {
+            border-radius: 24px;
+            resize: vertical;
+            min-height: 80px;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #1e88e5;
+            box-shadow: 0 0 0 3px rgba(30,136,229,0.1);
+        }
+        .btn {
+            background: #1e88e5;
+            border: none;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn:hover {
+            background: #0b5e8a;
+            transform: scale(0.97);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #1e88e5;
+            color: #1e88e5;
+        }
+        .btn-outline:hover {
+            background: #1e88e5;
+            color: white;
+        }
+        .btn-danger {
+            background: #e63946;
+        }
+        .btn-danger:hover {
+            background: #b91c2c;
+        }
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        /* filtros y búsqueda */
+        .barra-filtros {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            gap: 12px;
+            background: #ffffffdd;
+            padding: 12px 18px;
+            border-radius: 60px;
+            border: 1px solid #cfe3fc;
+        }
+        .search-box {
+            display: flex;
+            gap: 8px;
+            flex: 2;
+            min-width: 180px;
+        }
+        .search-box input {
+            border-radius: 40px;
+            margin: 0;
+        }
+        .priv-filter {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: #e3f2fd;
+            padding: 5px 15px;
+            border-radius: 40px;
+        }
+        .badge {
+            background: #d4e7f7;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .badge.privado {
+            background: #ffebcc;
+            color: #b45f06;
+        }
+        .badge.publico {
+            background: #c8e6e0;
+            color: #0a5e44;
+        }
+
+        /* posts grid */
+        .posts-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            margin-top: 15px;
+        }
+        .post-card {
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 5px 18px rgba(0,0,0,0.05);
+            border: 1px solid #d9ebff;
+            overflow: hidden;
+            transition: 0.2s;
+        }
+        .post-header {
+            padding: 18px 24px 8px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #eef2fa;
+        }
+        .post-titulo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0b3b5f;
+        }
+        .post-fecha {
+            font-size: 12px;
+            color: #5f8bb3;
+        }
+        .post-contenido {
+            padding: 18px 24px;
+        }
+        .post-texto {
+            margin-bottom: 20px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+        .media-content {
+            margin: 15px 0;
+        }
+        .media-content img {
+            max-width: 100%;
+            border-radius: 24px;
+            max-height: 380px;
+            object-fit: cover;
+            border: 1px solid #cfe3fc;
+        }
+        .media-content iframe, .media-content video {
+            max-width: 100%;
+            border-radius: 24px;
+            border: none;
+        }
+        .link-url a {
+            color: #1e88e5;
+            text-decoration: none;
+            word-break: break-all;
+            background: #eef5fc;
+            padding: 8px 14px;
+            border-radius: 50px;
+            display: inline-block;
+        }
+        .post-actions {
+            padding: 12px 24px 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            border-top: 1px solid #ecf3f9;
+            background: #fafdff;
+        }
+        .compartir-btns {
+            display: flex;
+            gap: 10px;
+            margin-left: auto;
+            align-items: center;
+        }
+        /* caja de comentarios al final de la web */
+        .comentarios-final {
+            margin-top: 50px;
+            background: #eef5fc;
+            border-radius: 28px;
+            padding: 25px;
+            border: 1px solid #cde3f5;
+        }
+        .comentarios-list {
+            max-height: 280px;
+            overflow-y: auto;
+            margin: 20px 0;
+            background: white;
+            border-radius: 24px;
+            padding: 12px;
+        }
+        .comentario-item {
+            padding: 12px;
+            border-bottom: 1px solid #e2edf7;
+            margin-bottom: 8px;
+        }
+        .comentario-nombre {
+            font-weight: bold;
+            color: #1e6f9f;
+        }
+        .comentario-texto {
+            margin-top: 5px;
+        }
+        .comentario-fecha {
+            font-size: 10px;
+            color: gray;
+        }
+
+        /* edición inline modal (simple) */
+        .modal-edit {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-card {
+            background: white;
+            max-width: 650px;
+            width: 90%;
+            border-radius: 32px;
+            padding: 25px;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.2);
+        }
+        @media (max-width: 700px) {
+            .container { padding: 15px; }
+            .post-header { flex-direction: column; gap: 6px; }
+        }
+        hr { margin: 15px 0; }
+        i { margin-right: 4px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1><i class="fas fa-feather-alt"></i> Muro Azul · Publicaciones</h1>
+
+    <!-- formulario para nuevo post -->
+    <div class="post-form">
+        <h3 style="margin-bottom: 12px; color:#1e6f9f;"><i class="fas fa-plus-circle"></i> Crear nuevo post</h3>
+        <div class="form-group">
+            <input type="text" id="postTitulo" placeholder="Título del post *" maxlength="100">
+        </div>
+        <div class="form-group">
+            <textarea id="postTexto" placeholder="Escribe tu contenido aquí..."></textarea>
+        </div>
+        <div class="form-group">
+            <input type="text" id="postImagen" placeholder="URL de imagen (opcional)">
+        </div>
+        <div class="form-group">
+            <input type="text" id="postVideo" placeholder="URL de video (YouTube, mp4 directo, etc.)">
+            <small style="color:#2c7ab1;">Pega enlace de YouTube (se incrustará) o video .mp4</small>
+        </div>
+        <div class="form-group">
+            <input type="text" id="postLink" placeholder="URL de enlace externo (opcional)">
+        </div>
+        <div class="form-group">
+            <label style="margin-right: 12px;"><i class="fas fa-lock"></i> Visibilidad:</label>
+            <select id="postPrivado">
+                <option value="publico">Público (visible para todos)</option>
+                <option value="privado">Privado (solo para mí)</option>
+            </select>
+        </div>
+        <button class="btn" id="btnPublicar"><i class="fas fa-paper-plane"></i> Publicar Post</button>
+    </div>
+
+    <!-- barra de filtros y busqueda -->
+    <div class="barra-filtros">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="🔍 Buscar por título o texto...">
+            <button id="clearSearch" class="btn-sm btn-outline"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="priv-filter">
+            <span><i class="fas fa-eye"></i> Mostrar:</span>
+            <select id="filterPrivado">
+                <option value="todos">Todos (públicos + privados)</option>
+                <option value="publico">Solo públicos</option>
+                <option value="privado">Solo privados</option>
+            </select>
+        </div>
+        <span id="postCount" class="badge">0 posts</span>
+    </div>
+
+    <!-- contenedor de posts -->
+    <div id="postsContainer" class="posts-grid">
+        <!-- los posts se renderizan dinámicamente -->
+    </div>
+
+    <!-- CAJA DE COMENTARIOS AL FINAL DE LA WEB (global) -->
+    <div class="comentarios-final">
+        <h3><i class="fas fa-comments"></i> Comentarios de la comunidad</h3>
+        <div id="comentariosLista" class="comentarios-list">
+            <!-- comentarios dinámicos -->
+        </div>
+        <div class="form-group" style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <input type="text" id="comentNombre" placeholder="Tu nombre" style="flex:1;">
+            <textarea id="comentTexto" placeholder="Escribe un comentario..." rows="2" style="flex:2;"></textarea>
+            <button id="btnComentar" class="btn"><i class="fas fa-paper-plane"></i> Comentar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL PARA EDITAR POST -->
+<div id="editModal" class="modal-edit">
+    <div class="modal-card">
+        <h3 style="color: #1e6f9f;"><i class="fas fa-edit"></i> Editar Post</h3>
+        <input type="hidden" id="editPostId">
+        <div class="form-group"><input type="text" id="editTitulo" placeholder="Título"></div>
+        <div class="form-group"><textarea id="editTexto" rows="3" placeholder="Contenido"></textarea></div>
+        <div class="form-group"><input type="text" id="editImagen" placeholder="URL imagen"></div>
+        <div class="form-group"><input type="text" id="editVideo" placeholder="URL video"></div>
+        <div class="form-group"><input type="text" id="editLink" placeholder="URL enlace"></div>
+        <div class="form-group">
+            <select id="editPrivado">
+                <option value="publico">Público</option>
+                <option value="privado">Privado</option>
+            </select>
+        </div>
+        <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 15px;">
+            <button class="btn-outline btn" id="closeModalBtn">Cancelar</button>
+            <button class="btn" id="saveEditBtn">Guardar cambios</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ---------- MODELO DE DATOS ----------
+    let posts = [];          // cada post: { id, titulo, texto, imagen, video, link, privado, fecha }
+    let comentarios = [];    // { id, nombre, texto, fecha }
+
+    // Cargar desde localStorage
+    function loadData() {
+        const storedPosts = localStorage.getItem('muroazul_posts');
+        if(storedPosts) posts = JSON.parse(storedPosts);
+        const storedComents = localStorage.getItem('muroazul_comentarios');
+        if(storedComents) comentarios = JSON.parse(storedComents);
+        if(!posts.length) {
+            // post de ejemplo
+            posts.push({
+                id: Date.now(),
+                titulo: "Bienvenida al Muro Azul",
+                texto: "Puedes subir posts con imágenes, videos, links y editarlos. Los posts se guardan en tu navegador.",
+                imagen: "https://picsum.photos/id/20/800/400",
+                video: "",
+                link: "https://ejemplo.com",
+                privado: "publico",
+                fecha: new Date().toLocaleString()
+            });
+        }
+        if(!comentarios.length) {
+            comentarios.push({ id: Date.now()+1, nombre: "Admin Azul", texto: "¡Primer comentario! Me encanta la web.", fecha: new Date().toLocaleString() });
+        }
+    }
+
+    function saveData() {
+        localStorage.setItem('muroazul_posts', JSON.stringify(posts));
+        localStorage.setItem('muroazul_comentarios', JSON.stringify(comentarios));
+    }
+
+    // Renderizar posts con filtros y búsqueda
+    function renderPosts() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const privFilter = document.getElementById('filterPrivado').value;
+        
+        let filtered = [...posts];
+        // filtro privado/publico
+        if(privFilter !== 'todos') {
+            filtered = filtered.filter(p => p.privado === privFilter);
+        }
+        // busqueda por título y texto
+        if(searchTerm) {
+            filtered = filtered.filter(p => p.titulo.toLowerCase().includes(searchTerm) || p.texto.toLowerCase().includes(searchTerm));
+        }
+        // ordenar por fecha descendente (más nuevo primero)
+        filtered.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+        
+        const container = document.getElementById('postsContainer');
+        if(filtered.length === 0) {
+            container.innerHTML = `<div style="text-align:center; padding:50px; background:#f5faff; border-radius:50px;">📭 No hay posts que coincidan</div>`;
+            document.getElementById('postCount').innerText = `0 posts`;
+            return;
+        }
+        document.getElementById('postCount').innerText = `${filtered.length} post${filtered.length!==1?'s':''}`;
+        
+        let html = '';
+        filtered.forEach(post => {
+            // privado badge
+            const privClass = post.privado === 'privado' ? 'privado' : 'publico';
+            const privText = post.privado === 'privado' ? '🔒 Privado' : '🌍 Público';
+            
+            // construcción multimedia
+            let mediaHtml = '';
+            if(post.imagen && post.imagen.trim() !== '') {
+                mediaHtml += `<div class="media-content"><img src="${escapeHtml(post.imagen)}" alt="imagen" loading="lazy" onerror="this.style.display='none'"></div>`;
+            }
+            if(post.video && post.video.trim() !== '') {
+                let videoUrl = post.video.trim();
+                let embed = '';
+                if(videoUrl.includes('youtube.com/watch') || videoUrl.includes('youtu.be')) {
+                    let vidId = '';
+                    if(videoUrl.includes('youtu.be/')) vidId = videoUrl.split('youtu.be/')[1]?.split('?')[0];
+                    else if(videoUrl.includes('v=')) vidId = videoUrl.split('v=')[1]?.split('&')[0];
+                    if(vidId) embed = `<iframe width="100%" height="300" src="https://www.youtube.com/embed/${vidId}" frameborder="0" allowfullscreen></iframe>`;
+                    else embed = `<video controls width="100%"><source src="${videoUrl}" type="video/mp4">Tu navegador no soporta video</video>`;
+                } else {
+                    embed = `<video controls width="100%"><source src="${videoUrl}" type="video/mp4">Video no disponible</video>`;
+                }
+                mediaHtml += `<div class="media-content">${embed}</div>`;
+            }
+            if(post.link && post.link.trim() !== '') {
+                mediaHtml += `<div class="link-url"><a href="${escapeHtml(post.link)}" target="_blank"><i class="fas fa-external-link-alt"></i> ${escapeHtml(post.link.length>50 ? post.link.substring(0,50)+'...' : post.link)}</a></div>`;
+            }
+            
+            html += `
+                <div class="post-card" data-id="${post.id}">
+                    <div class="post-header">
+                        <div class="post-titulo">${escapeHtml(post.titulo)} <span class="badge ${privClass}">${privText}</span></div>
+                        <div class="post-fecha"><i class="far fa-calendar-alt"></i> ${escapeHtml(post.fecha)}</div>
+                    </div>
+                    <div class="post-contenido">
+                        <div class="post-texto">${escapeHtml(post.texto).replace(/\n/g, '<br>')}</div>
+                        ${mediaHtml}
+                    </div>
+                    <div class="post-actions">
+                        <button class="btn-sm btn-outline edit-post" data-id="${post.id}"><i class="fas fa-pen"></i> Editar</button>
+                        <button class="btn-sm btn-danger delete-post" data-id="${post.id}"><i class="fas fa-trash"></i> Eliminar</button>
+                        <button class="btn-sm toggle-privado" data-id="${post.id}"><i class="fas fa-lock"></i> ${post.privado === 'privado' ? 'Hacer público' : 'Hacer privado'}</button>
+                        <div class="compartir-btns">
+                            <span><i class="fas fa-share-alt"></i> Compartir:</span>
+                            <button class="btn-sm share-btn" data-platform="facebook" data-id="${post.id}"><i class="fab fa-facebook"></i></button>
+                            <button class="btn-sm share-btn" data-platform="twitter" data-id="${post.id}"><i class="fab fa-twitter"></i></button>
+                            <button class="btn-sm share-btn" data-platform="whatsapp" data-id="${post.id}"><i class="fab fa-whatsapp"></i></button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+        
+        // eventos dinámicos
+        document.querySelectorAll('.edit-post').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = parseInt(btn.dataset.id);
+                openEditModal(id);
+            });
+        });
+        document.querySelectorAll('.delete-post').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = parseInt(btn.dataset.id);
+                if(confirm('¿Eliminar este post permanentemente?')) {
+                    posts = posts.filter(p => p.id !== id);
+                    saveData();
+                    renderPosts();
+                }
+            });
+        });
+        document.querySelectorAll('.toggle-privado').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = parseInt(btn.dataset.id);
+                const post = posts.find(p => p.id === id);
+                if(post) {
+                    post.privado = post.privado === 'privado' ? 'publico' : 'privado';
+                    saveData();
+                    renderPosts();
+                }
+            });
+        });
+        document.querySelectorAll('.share-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = parseInt(btn.dataset.id);
+                const post = posts.find(p => p.id === id);
+                if(post) {
+                    const platform = btn.dataset.platform;
+                    const titulo = encodeURIComponent(post.titulo);
+                    const url = encodeURIComponent(window.location.href);
+                    let shareLink = '';
+                    if(platform === 'facebook') shareLink = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+                    else if(platform === 'twitter') shareLink = `https://twitter.com/intent/tweet?text=${titulo}&url=${url}`;
+                    else if(platform === 'whatsapp') shareLink = `https://api.whatsapp.com/send?text=${titulo} ${url}`;
+                    if(shareLink) window.open(shareLink, '_blank');
+                    else alert("Compartir no disponible");
+                }
+            });
+        });
+    }
+    
+    function openEditModal(id) {
+        const post = posts.find(p => p.id === id);
+        if(!post) return;
+        document.getElementById('editPostId').value = post.id;
+        document.getElementById('editTitulo').value = post.titulo;
+        document.getElementById('editTexto').value = post.texto;
+        document.getElementById('editImagen').value = post.imagen || '';
+        document.getElementById('editVideo').value = post.video || '';
+        document.getElementById('editLink').value = post.link || '';
+        document.getElementById('editPrivado').value = post.privado;
+        document.getElementById('editModal').style.display = 'flex';
+    }
+    
+    function closeModal() {
+        document.getElementById('editModal').style.display = 'none';
+    }
+    
+    function saveEdit() {
+        const id = parseInt(document.getElementById('editPostId').value);
+        const index = posts.findIndex(p => p.id === id);
+        if(index !== -1) {
+            posts[index].titulo = document.getElementById('editTitulo').value.trim() || "Sin título";
+            posts[index].texto = document.getElementById('editTexto').value;
+            posts[index].imagen = document.getElementById('editImagen').value;
+            posts[index].video = document.getElementById('editVideo').value;
+            posts[index].link = document.getElementById('editLink').value;
+            posts[index].privado = document.getElementById('editPrivado').value;
+            posts[index].fecha = new Date().toLocaleString() + " (editado)";
+            saveData();
+            renderPosts();
+            closeModal();
+        }
+    }
+    
+    function publicarNuevoPost() {
+        const titulo = document.getElementById('postTitulo').value.trim();
+        if(!titulo) { alert("El título es obligatorio"); return; }
+        const texto = document.getElementById('postTexto').value;
+        const imagen = document.getElementById('postImagen').value;
+        const video = document.getElementById('postVideo').value;
+        const link = document.getElementById('postLink').value;
+        const privado = document.getElementById('postPrivado').value;
+        const nuevoPost = {
+            id: Date.now(),
+            titulo: titulo,
+            texto: texto,
+            imagen: imagen,
+            video: video,
+            link: link,
+            privado: privado,
+            fecha: new Date().toLocaleString()
+        };
+        posts.unshift(nuevoPost);
+        saveData();
+        // limpiar formulario
+        document.getElementById('postTitulo').value = '';
+        document.getElementById('postTexto').value = '';
+        document.getElementById('postImagen').value = '';
+        document.getElementById('postVideo').value = '';
+        document.getElementById('postLink').value = '';
+        document.getElementById('postPrivado').value = 'publico';
+        renderPosts();
+    }
+    
+    // Comentarios al final
+    function renderComentarios() {
+        const container = document.getElementById('comentariosLista');
+        if(!comentarios.length) {
+            container.innerHTML = '<div style="text-align:center; padding:15px;">💬 Aún no hay comentarios. ¡Sé el primero!</div>';
+            return;
+        }
+        let html = '';
+        comentarios.slice().reverse().forEach(c => {
+            html += `<div class="comentario-item">
+                        <div class="comentario-nombre"><i class="fas fa-user-circle"></i> ${escapeHtml(c.nombre)} <span class="comentario-fecha">${escapeHtml(c.fecha)}</span></div>
+                        <div class="comentario-texto">${escapeHtml(c.texto)}</div>
+                    </div>`;
+        });
+        container.innerHTML = html;
+    }
+    
+    function agregarComentario() {
+        let nombre = document.getElementById('comentNombre').value.trim();
+        const texto = document.getElementById('comentTexto').value.trim();
+        if(!texto) { alert("Escribe un comentario"); return; }
+        if(!nombre) nombre = "Anónimo";
+        const nuevo = {
+            id: Date.now(),
+            nombre: nombre,
+            texto: texto,
+            fecha: new Date().toLocaleString()
+        };
+        comentarios.push(nuevo);
+        saveData();
+        renderComentarios();
+        document.getElementById('comentNombre').value = '';
+        document.getElementById('comentTexto').value = '';
+    }
+    
+    function escapeHtml(str) {
+        if(!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if(m === '&') return '&amp;';
+            if(m === '<') return '&lt;';
+            if(m === '>') return '&gt;';
+            return m;
+        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+            return c;
+        });
+    }
+    
+    // EVENTOS INICIALES
+    document.addEventListener('DOMContentLoaded', () => {
+        loadData();
+        renderPosts();
+        renderComentarios();
+        
+        document.getElementById('btnPublicar').addEventListener('click', publicarNuevoPost);
+        document.getElementById('btnComentar').addEventListener('click', agregarComentario);
+        document.getElementById('searchInput').addEventListener('input', () => renderPosts());
+        document.getElementById('clearSearch').addEventListener('click', () => {
+            document.getElementById('searchInput').value = '';
+            renderPosts();
+        });
+        document.getElementById('filterPrivado').addEventListener('change', () => renderPosts());
+        document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+        document.getElementById('saveEditBtn').addEventListener('click', saveEdit);
+        window.addEventListener('click', (e) => { if(e.target === document.getElementById('editModal')) closeModal(); });
+    });
+</script>
+</body>
+</html>
